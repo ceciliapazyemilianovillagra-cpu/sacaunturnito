@@ -16,4 +16,3 @@ export async function GET(request: NextRequest) {
   }));
   return NextResponse.json({ processed:results.length, results });
 }
-
