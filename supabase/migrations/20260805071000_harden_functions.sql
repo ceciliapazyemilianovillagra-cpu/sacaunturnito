@@ -1,0 +1,21 @@
+create schema if not exists private;
+revoke all on schema private from public;
+create or replace function private.current_org_id() returns uuid language sql stable security definer set search_path=public as $$ select organization_id from public.profiles where id=auth.uid() $$;
+revoke all on function private.current_org_id() from public;
+drop policy if exists organization_members on public.organizations;
+drop policy if exists profile_members on public.profiles;
+drop policy if exists location_members on public.locations;
+drop policy if exists service_members on public.services;
+drop policy if exists customer_members on public.customers;
+drop policy if exists appointment_members on public.appointments;
+drop policy if exists notification_members on public.notification_log;
+create policy organization_members on public.organizations for select to authenticated using (id=(select private.current_org_id()));
+create policy profile_members on public.profiles for select to authenticated using (organization_id=(select private.current_org_id()));
+create policy location_members on public.locations for all to authenticated using (organization_id=(select private.current_org_id())) with check (organization_id=(select private.current_org_id()));
+create policy service_members on public.services for all to authenticated using (organization_id=(select private.current_org_id())) with check (organization_id=(select private.current_org_id()));
+create policy customer_members on public.customers for all to authenticated using (organization_id=(select private.current_org_id())) with check (organization_id=(select private.current_org_id()));
+create policy appointment_members on public.appointments for all to authenticated using (organization_id=(select private.current_org_id())) with check (organization_id=(select private.current_org_id()));
+create policy notification_members on public.notification_log for select to authenticated using (exists(select 1 from public.appointments a where a.id=appointment_id and a.organization_id=(select private.current_org_id())));
+drop function if exists public.appointments_due_for_reminders();
+drop function if exists public.current_org_id();
+
