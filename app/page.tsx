@@ -1,5 +1,2 @@
-const features = ['Agenda en tiempo real', 'Reservas online', 'Recordatorios automÃ¡ticos por WhatsApp', 'Clientes, profesionales y servicios'];
-export default function Home() {
-  return <main><section className="hero"><p className="eyebrow">SISTEMA DE TURNOS</p><h1>Tu agenda, clara y siempre disponible.</h1><p className="lead">AdministrÃ¡ reservas, clientes y recordatorios desde un Ãºnico lugar.</p><div className="actions"><a href="/reservar">Reservar un turno</a><a className="secondary" href="/ingresar">Ingresar al panel</a></div></section><section className="grid">{features.map(f=><article key={f}><span>âœ“</span>{f}</article>)}</section></main>
-}
-
+const features = ['Agenda en tiempo real', 'Reservas online', 'Recordatorios automaticos por WhatsApp', 'Clientes, profesionales y servicios'];
+export default function Home() { return <main><section className="hero"><p className="brand">SACA UN TURNITO</p><h1>Tu turno, facil y en un minuto.</h1><p className="lead">Reservas simples, disponibilidad real y recordatorios en un solo lugar.</p><div className="actions"><a href="/reservar">Sacar un turno</a><a className="secondary" href="/ingresar">Ingresar</a></div></section><section className="feature-grid">{features.map(f=><article className="feature" key={f}><span className="feature-mark">+</span>{f}</article>)}</section></main> }
