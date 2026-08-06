@@ -27,10 +27,11 @@ export async function updateSession(request:NextRequest){
  const claims=data?.claims;
  const path=request.nextUrl.pathname;
 
- if(path.startsWith('/panel')&&!claims){
+ if((path.startsWith('/panel')||path==='/crear-clave')&&!claims){
   const url=request.nextUrl.clone();
   url.pathname='/ingresar';
   url.search='';
+  url.searchParams.set('tipo','profesional');
   url.searchParams.set('next',`${path}${request.nextUrl.search}`);
   return copySession(response,NextResponse.redirect(url));
  }
@@ -52,7 +53,7 @@ export async function updateSession(request:NextRequest){
   }
  }
 
- if(path.startsWith('/panel')||path.startsWith('/auth/')){
+ if(path.startsWith('/panel')||path.startsWith('/auth/')||path==='/crear-clave'){
   response.headers.set('Cache-Control','private, no-store, max-age=0');
   response.headers.set('Pragma','no-cache');
  }
