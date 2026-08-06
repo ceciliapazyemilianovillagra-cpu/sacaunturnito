@@ -10,15 +10,31 @@ const manrope = Manrope({ subsets: ['latin'], display: 'swap', variable: '--font
 const instagram = process.env.NEXT_PUBLIC_SPC_INSTAGRAM || 'https://www.instagram.com/soypulsocreativo/';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://sacaunturnito.vercel.app'),
   applicationName: 'SACA UN TURNITO',
   title: { default: 'SACA UN TURNITO', template: '%s | SACA UN TURNITO' },
   description: 'Turnos online simples, seguros y ordenados.',
   manifest: '/manifest.webmanifest',
   icons: { icon: '/icon.svg', apple: '/apple-icon' },
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'SACA UN TURNITO' },
+  openGraph: {
+    type: 'website',
+    locale: 'es_AR',
+    url: '/',
+    siteName: 'SACA UN TURNITO',
+    title: 'SACA UN TURNITO',
+    description: 'Tu próximo turno, sin vueltas.',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'SACA UN TURNITO' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SACA UN TURNITO',
+    description: 'Tu próximo turno, sin vueltas.',
+    images: ['/og.png'],
+  },
 };
 
-export const viewport: Viewport = { themeColor: '#3157f6' };
+export const viewport: Viewport = { themeColor: '#0768c5' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
