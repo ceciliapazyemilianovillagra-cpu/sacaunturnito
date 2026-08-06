@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase-browser';
 
 type AccessType = 'chooser' | 'client' | 'professional';
@@ -10,6 +10,10 @@ const accountLabels = {
   client: 'cliente o paciente',
   professional: 'profesional',
 } as const;
+
+const salesNumber = (process.env.NEXT_PUBLIC_SPC_WHATSAPP || '').replace(/\D/g, '');
+const salesMessage = encodeURIComponent('Hola, quiero contratar SACA UN TURNITO para mi negocio.');
+const salesWhatsappUrl = salesNumber ? `https://wa.me/${salesNumber}?text=${salesMessage}` : `https://wa.me/?text=${salesMessage}`;
 
 function safeRequestedPath(access: Exclude<AccessType, 'chooser'>) {
   const requested = new URLSearchParams(location.search).get('next') || '';
@@ -52,12 +56,6 @@ export default function Ingresar() {
       setAccess('professional');
       setMessage('Esta cuenta fue desactivada. Contacta al administrador de tu organización.');
     }
-  }, []);
-
-  const whatsappUrl = useMemo(() => {
-    const number = (process.env.NEXT_PUBLIC_SPC_WHATSAPP || '').replace(/\D/g, '');
-    const text = encodeURIComponent('Hola, quiero contratar SACA UN TURNITO para mi negocio.');
-    return number ? `https://wa.me/${number}?text=${text}` : `https://wa.me/?text=${text}`;
   }, []);
 
   function choose(next: Exclude<AccessType, 'chooser'>) {
@@ -254,7 +252,7 @@ export default function Ingresar() {
               ) : (
                 <div className="professional-sale">
                   <span>¿Todavía no usás SACA UN TURNITO?</span>
-                  <a href={whatsappUrl} target="_blank" rel="noreferrer">Quiero el servicio <b>↗</b></a>
+                  <a href={salesWhatsappUrl} target="_blank" rel="noreferrer">Quiero el servicio <b>↗</b></a>
                   <small>Te atenderá el equipo de SOY PULSO CREATIVO por WhatsApp.</small>
                 </div>
               )}
