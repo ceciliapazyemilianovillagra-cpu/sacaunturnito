@@ -48,7 +48,7 @@ export async function POST(request:Request){
   if((count??0)>=10)return reply({error:'Se alcanzó el límite de invitaciones. Intenta nuevamente más tarde.'},429);
   await admin.from('security_audit_log').insert({organization_id:manager.organization_id,actor_user_id:user.id,action:'staff.invite_attempt',entity:'profiles',details:{role:input.role}});
 
-  const callback=new URL('/auth/callback?next=/panel',request.url).toString();
+  const callback=new URL('/auth/callback?next=/crear-clave',request.url).toString();
   const {data:invite,error:inviteError}=await admin.auth.admin.inviteUserByEmail(input.email,{redirectTo:callback,data:{full_name:input.full_name}});
   if(inviteError){console.warn('[admin/staff] invite rejected',inviteError.message);return reply({error:'No se pudo enviar la invitación. Verifica si el correo ya tiene una cuenta.'},400)}
   const {error:profileError}=await admin.from('profiles').upsert({id:invite.user.id,organization_id:manager.organization_id,full_name:input.full_name,role:input.role,specialty:input.specialty,is_bookable:input.role==='professional'&&input.is_bookable,active:true});
