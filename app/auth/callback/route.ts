@@ -52,7 +52,8 @@ export async function GET(request: Request) {
 
   // Google and public registration are client-only. Internal accounts must use
   // the credentials issued by their organization, even if an OAuth link is forced.
-  if (accountType === 'cliente' && profile) {
+  const usedGoogle = user.identities?.some((identity) => identity.provider === 'google') ?? false;
+  if (profile && (accountType === 'cliente' || usedGoogle)) {
     response = noStore(NextResponse.redirect(new URL('/ingresar?tipo=profesional&error=metodo', url.origin)));
     await db.auth.signOut();
     return response;
