@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saca-un-turnito-v1';
+const CACHE_NAME = 'saca-un-turnito-v2';
 const APP_SHELL = ['/', '/ingresar', '/icon.svg'];
 
 self.addEventListener('install', event => {
