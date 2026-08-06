@@ -1,0 +1,66 @@
+:root{
+  --radius-card:22px;
+  --radius-control:13px;
+  --shadow-soft:0 12px 32px #24345f10;
+  --shadow-lift:0 22px 52px #24345f1c;
+  --ease-ui:cubic-bezier(.2,.8,.2,1);
+}
+
+html{font-size:16px}
+body{font-family:var(--font-manrope),ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;text-rendering:optimizeLegibility}
+p{line-height:1.7}
+small{font-size:13px;line-height:1.5}
+button,input,select,textarea{font:inherit}
+:where(a,button,input,select,textarea,[role="button"]){transition:transform .2s var(--ease-ui),background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease,opacity .2s ease}
+:where(a,button,[role="button"]):focus-visible{outline:3px solid #3157f638;outline-offset:3px}
+:where(input,select,textarea):focus{outline:none;border-color:#8096ff;box-shadow:0 0 0 4px #3157f618}
+:where(.selected,.active,[aria-selected="true"]){transition:transform .2s var(--ease-ui),background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease}
+
+.card,.feature,.stat-card,.appointment,.surface,.metric-card,.entity-card,.booking-main,.booking-summary,.login-required,.booking-success,.persona-card,.credential-card{border-radius:var(--radius-card);box-shadow:var(--shadow-soft);animation:uiEnter .48s var(--ease-ui) both;transition:transform .2s var(--ease-ui),box-shadow .2s ease,border-color .2s ease,background-color .2s ease}
+.card:hover,.feature:hover,.stat-card:hover,.appointment:hover,.metric-card:hover,.entity-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+.feature-grid>*:nth-child(2),.stat-grid>*:nth-child(2),.admin-stats>*:nth-child(2),.entity-grid>*:nth-child(2){animation-delay:.05s}
+.feature-grid>*:nth-child(3),.stat-grid>*:nth-child(3),.admin-stats>*:nth-child(3),.entity-grid>*:nth-child(3){animation-delay:.1s}
+.feature-grid>*:nth-child(4),.stat-grid>*:nth-child(4),.admin-stats>*:nth-child(4),.entity-grid>*:nth-child(4){animation-delay:.15s}
+.actions a:hover,.primary-link:hover,.primary-button:hover{transform:translateY(-2px);box-shadow:0 14px 30px #3157f630}
+
+/* Marca */
+.app-logo{display:inline-grid;place-items:center;width:44px;height:44px;flex:0 0 auto;filter:drop-shadow(0 8px 14px #3157f628)}
+.app-logo svg{display:block;width:100%;height:100%;overflow:visible}
+.app-logo.settings-logo{width:64px;height:64px}
+.auth-logo>.app-logo,.admin-logo>.app-logo{width:44px;height:44px;padding:0;background:transparent;color:inherit;box-shadow:none;border-radius:0}
+.booking-brand>a:first-child{width:44px;height:44px;padding:0;background-image:url('/icon.svg');background-size:44px;background-position:center;background-repeat:no-repeat;color:transparent;font-size:0;box-shadow:none}
+.booking-brand>a:first-child .app-logo{width:44px;height:44px}
+
+/* Cabecera y navegación profesional */
+.admin-content{min-width:0}
+.admin-topbar{position:sticky;top:0;z-index:45;min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px clamp(20px,4vw,54px);border-bottom:1px solid #e8ebf2;background:#f9faffd9;backdrop-filter:blur(16px)}
+.topbar-context{display:flex;align-items:center;gap:9px;color:#6e798f;font-size:14px;font-weight:800}.topbar-live{width:9px;height:9px;border-radius:50%;background:#3fc287;box-shadow:0 0 0 5px #3fc28717}
+.topbar-actions{display:flex;align-items:center;gap:8px}.topbar-actions a,.topbar-actions button{display:inline-flex;align-items:center;gap:8px;min-height:40px;border:1px solid #e0e5ef;border-radius:12px;background:#fff;padding:9px 13px;color:#3f4c65;text-decoration:none;font-size:14px;font-weight:800;cursor:pointer}.topbar-actions a:hover,.topbar-actions button:hover,.topbar-actions a.active{transform:translateY(-2px);border-color:#cbd5ff;box-shadow:0 10px 24px #24345f13;color:#3157f6}.topbar-actions button{color:#c44f45}.topbar-actions button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.admin-sidebar nav a,.sidebar-bottom a,.sidebar-bottom button{font-size:14px;transition:transform .2s var(--ease-ui),background-color .2s ease,color .2s ease,box-shadow .2s ease}.admin-sidebar nav a:hover,.sidebar-bottom a:hover,.sidebar-bottom button:hover{transform:translateX(3px)}
+.admin-sidebar nav a>span,.sidebar-bottom :is(a,button)>span{font-size:13px;transition:transform .2s var(--ease-ui),background-color .2s ease,color .2s ease}.admin-sidebar nav a:hover>span,.sidebar-bottom :is(a,button):hover>span{transform:scale(1.08)}
+.sidebar-bottom :is(a,button){display:flex;align-items:center;gap:9px}.sidebar-bottom :is(a,button)>span{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#ffffff12;color:#fff;font-size:12px;font-weight:900}
+.mobile-admin-bar{display:none}
+
+/* Formularios, agenda y reservas */
+.management-form label,.booking-summary label,.choice-grid label,.date-field,.booking-hero>label{font-size:14px;line-height:1.45}
+.management-form input,.management-form textarea,.management-form select,.booking-summary input,.choice-grid select,.date-field input,.appointment-admin-row select,.booking-hero select{min-height:46px;border-radius:var(--radius-control);font-size:15px;transition:border-color .2s ease,box-shadow .2s ease,transform .2s var(--ease-ui)}
+.management-form textarea{min-height:112px}.management-form input:focus,.management-form textarea:focus,.management-form select:focus,.booking-summary input:focus,.choice-grid select:focus,.date-field input:focus{transform:translateY(-1px)}
+.turn-row,.data-row,.appointment-admin-row,.service-choices button,.slot-grid button{transition:transform .2s var(--ease-ui),background-color .2s ease,border-color .2s ease,box-shadow .2s ease;animation:uiEnter .4s var(--ease-ui) both}
+.turn-row:hover,.data-row:hover,.appointment-admin-row:hover{position:relative;z-index:1;transform:translateY(-1px);background:#fafbff;box-shadow:0 9px 24px #24345f0d}
+.service-choices button:hover,.slot-grid button:hover{transform:translateY(-2px);box-shadow:0 12px 25px #24345f14}.service-choices button.selected,.slot-grid button.selected{transform:translateY(-1px);box-shadow:0 10px 28px #3157f626}
+.page-kicker,.section-heading span,.modal-head span,.public-link span,.booking-brand span,.booking-step small,.service-choices small,.service-choices button>span,.hold-note,.data-row small,.appointment-admin-row small,.entity-card>small,.persona-card small,.secure-note,.auth-back,.access-label,.professional-sale>span,.professional-sale small,.warm-pill,.mini-agenda span,.mini-agenda small{font-size:13px}
+.admin-page-header>div>p:not(.page-kicker),.booking-hero>div>p:last-child,.auth-intro,.credential-card>p:not(.page-kicker):not(.message),.entity-card>p,.professional-head p,.empty-state p{font-size:16px;line-height:1.65}
+.entity-card h3{font-size:18px}.data-row b,.appointment-admin-row b,.summary-line,.booking-step b,.service-choices b{font-size:14px}.status,.pill-row span,.service-meta b,.card-actions button,.data-row button{font-size:13px}
+
+/* Configuración de la aplicación */
+.settings-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:0 clamp(20px,4vw,54px) 80px;margin-top:-26px}
+.settings-tool-card{display:grid;grid-template-columns:auto 1fr;align-items:start;gap:20px;min-height:235px;padding:25px;border:1px solid #edf0f6;border-radius:var(--radius-card);background:#fff;box-shadow:var(--shadow-soft);animation:uiEnter .5s var(--ease-ui) both;transition:transform .2s var(--ease-ui),box-shadow .2s ease,border-color .2s ease}.settings-tool-card:hover{transform:translateY(-3px);border-color:#dce3f4;box-shadow:var(--shadow-lift)}.settings-tool-card h2{margin:4px 0 8px;font-size:22px;letter-spacing:-.03em}.settings-tool-card p:not(.page-kicker){margin:0;color:#707b91;font-size:15px;line-height:1.65}.security-card{animation-delay:.07s;background:linear-gradient(145deg,#fff,#fff9f7)}
+.settings-shield{display:grid;place-items:center;width:60px;height:60px;border-radius:18px;background:#fff0e9;color:#e96549}.settings-shield svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.logout-danger{margin-top:18px;border:1px solid #f0c9c2;border-radius:12px;background:#fff;color:#bd443a;padding:11px 14px;font-size:14px;font-weight:800;cursor:pointer}.logout-danger:hover{transform:translateY(-2px);background:#fff5f3;box-shadow:0 11px 25px #bd443a17}
+.install-app-action{display:grid;justify-items:start;gap:10px;margin-top:18px}.install-app-button{display:inline-flex;align-items:center;gap:9px;border:1px solid #cfd8ef;border-radius:12px;background:#fff;color:#3157f6;padding:11px 14px;font-size:14px;font-weight:800;cursor:pointer}.install-app-button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.install-app-button:hover{transform:translateY(-2px);box-shadow:0 12px 25px #24345f14}.install-help{max-width:520px;margin:0;color:#68748b;font-size:13px;line-height:1.55}
+
+/* Crédito */
+.creator-credit{position:fixed;right:18px;bottom:16px;z-index:80;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #ffffffb8;border-radius:999px;background:#ffffffde;backdrop-filter:blur(12px);box-shadow:0 10px 30px #24345f1c;color:#6d778b;text-decoration:none;font-size:13px;line-height:1.2}.creator-credit strong{color:#26334d;font-size:13px}.creator-credit svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7}.creator-credit:hover{transform:translateY(-2px);background:#fff;box-shadow:0 14px 34px #24345f27;color:#3157f6}
+
+@keyframes uiEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:760px){.admin-topbar{display:none}.mobile-admin-bar{display:flex;min-height:64px;height:auto}.mobile-admin-bar .mobile-brand{display:flex;align-items:center;gap:8px}.mobile-admin-bar .app-logo{width:35px;height:35px}.mobile-admin-bar>div{display:flex;align-items:center;gap:6px}.mobile-admin-bar button,.mobile-admin-bar>div a{border:1px solid #e0e5ef;border-radius:10px;background:#fff;padding:8px 10px;color:#3157f6;font-size:13px;font-weight:800;text-decoration:none}.settings-tools{grid-template-columns:1fr;padding:0 16px 84px;margin-top:-24px}.settings-tool-card{grid-template-columns:1fr}.creator-credit{right:10px;bottom:9px;padding:8px 10px}.creator-credit,.creator-credit strong{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
