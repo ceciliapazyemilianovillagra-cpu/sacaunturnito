@@ -51,16 +51,6 @@ export default function AdminShell({ children, role }: { children: React.ReactNo
       </aside>
 
       <div className="admin-content">
-        <header className="admin-topbar">
-          <div className="topbar-context"><span className="topbar-live" /> Espacio profesional</div>
-          <div className="topbar-actions">
-            {!isProfessional && <a href="/panel/configuracion" className={path === '/panel/configuracion' ? 'active' : ''}>Configuración</a>}
-            <button type="button" onClick={exit}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5v16h5M14 8l4 4-4 4m4-4H9" /></svg>
-              Cerrar sesión
-            </button>
-          </div>
-        </header>
         <header className="mobile-admin-bar">
           <a className="mobile-brand" href="/panel"><AppLogo title="SACA UN TURNITO" /><b>SACA UN TURNITO</b></a>
           <div>
