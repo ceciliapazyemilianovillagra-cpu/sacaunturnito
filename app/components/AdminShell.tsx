@@ -15,7 +15,7 @@ const nav = [
   ['/panel/configuracion', 'CO', 'Configuración'],
 ];
 
-export default function AdminShell({ children, role }: { children: React.ReactNode; role?: string }) {
+export default function AdminShell({ children, role, tenantSlug }: { children: React.ReactNode; role?: string; tenantSlug?: string }) {
   const path = usePathname();
   const isProfessional = role === 'professional';
   const visibleNav = isProfessional
@@ -44,7 +44,7 @@ export default function AdminShell({ children, role }: { children: React.ReactNo
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <a href="/reservar" target="_blank" rel="noreferrer"><span>AB</span><b>Abrir reservas</b></a>
+          <a href={tenantSlug ? `/turnos/${tenantSlug}` : '/reservar'} target="_blank" rel="noreferrer"><span>AB</span><b>Abrir reservas</b></a>
           {!isProfessional && <a href="/panel/configuracion"><span>CO</span><b>Configuración</b></a>}
           <button onClick={exit}><span>SA</span><b>Cerrar sesión</b></button>
         </div>
