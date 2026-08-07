@@ -15,7 +15,16 @@ export const metadata: Metadata = {
   title: { default: 'SACA UN TURNITO', template: '%s | SACA UN TURNITO' },
   description: 'Turnos online simples, seguros y ordenados.',
   manifest: '/manifest.webmanifest',
-  icons: { icon: '/icon.svg', apple: '/apple-icon' },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', type: 'image/x-icon' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: ['/favicon.ico'],
+  },
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'SACA UN TURNITO' },
   openGraph: {
     type: 'website',
@@ -24,17 +33,17 @@ export const metadata: Metadata = {
     siteName: 'SACA UN TURNITO',
     title: 'SACA UN TURNITO',
     description: 'Tu próximo turno, sin vueltas.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'SACA UN TURNITO' }],
+    images: [{ url: '/hero-woman.webp', width: 1800, height: 766, alt: 'Reservá tu próximo turno con SACA UN TURNITO' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SACA UN TURNITO',
     description: 'Tu próximo turno, sin vueltas.',
-    images: ['/og.png'],
+    images: ['/hero-woman.webp'],
   },
 };
 
-export const viewport: Viewport = { themeColor: '#0768c5' };
+export const viewport: Viewport = { themeColor: '#f27a5d' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
