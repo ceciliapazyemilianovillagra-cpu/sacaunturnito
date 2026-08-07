@@ -1,22 +1,244 @@
 'use client';
-import { FormEvent,useEffect,useMemo,useState } from 'react';
-import { supabase } from '../../lib/supabase-browser';
 
-type Org={id:string;name:string;slug:string;description?:string};
-type Catalog={organization:{id:string;name:string;description?:string;hold_minutes:number};locations:Array<{id:string;name:string;address:string}>;services:Array<{id:string;name:string;description:string;duration_minutes:number;price:number;color:string}>;professionals:Array<{id:string;full_name:string;specialty:string;color:string}>};
-const tomorrow=()=>{const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10)};
-export default function BookingWizard(){
- const [user,setUser]=useState<any>(undefined);const [orgs,setOrgs]=useState<Org[]>([]);const [slug,setSlug]=useState('');const [catalog,setCatalog]=useState<Catalog|null>(null);const [service,setService]=useState('');const [professional,setProfessional]=useState('');const [branch,setBranch]=useState('');const [date,setDate]=useState(tomorrow);const [slots,setSlots]=useState<string[]>([]);const [slot,setSlot]=useState('');const [loading,setLoading]=useState(true);const [message,setMessage]=useState('');const [done,setDone]=useState(false);
- const selectedService=useMemo(()=>catalog?.services.find(x=>x.id===service),[catalog,service]);
- useEffect(()=>{void start()},[]);
- useEffect(()=>{if(slug)void loadCatalog(slug)},[slug]);
- useEffect(()=>{if(slug&&service&&professional&&branch&&date)void loadSlots();else{setSlots([]);setSlot('')}},[slug,service,professional,branch,date]);
- async function start(){const db=supabase();const {data:{user:u}}=await db.auth.getUser();setUser(u);if(u){const {data,error}=await db.rpc('list_booking_organizations');if(error)setMessage(error.message);else{const list=(data??[]) as Org[];setOrgs(list);const querySlug=new URLSearchParams(location.search).get('empresa');setSlug(list.find(x=>x.slug===querySlug)?.slug||list[0]?.slug||'')}}setLoading(false)}
- async function loadCatalog(value:string){const {data,error}=await supabase().rpc('get_booking_catalog',{p_slug:value});if(error)setMessage(error.message);else{setCatalog(data as Catalog);const c=data as Catalog;setBranch(c.locations[0]?.id||'');setService(c.services[0]?.id||'');setProfessional(c.professionals[0]?.id||'')}}
- async function loadSlots(){setMessage('');const {data,error}=await supabase().rpc('available_slots',{p_slug:slug,p_service_id:service,p_professional_id:professional,p_location_id:branch,p_date:date});if(error)setMessage(error.message);else{const list=(data??[]).map((x:any)=>x.slot_start);setSlots(list);setSlot('')}}
- async function book(e:FormEvent<HTMLFormElement>){e.preventDefault();if(!slot){setMessage('Seleccioná un horario disponible.');return}const f=new FormData(e.currentTarget);const {error}=await supabase().rpc('create_booking_secure',{p_slug:slug,p_service_id:service,p_professional_id:professional,p_location_id:branch,p_starts_at:slot,p_customer_name:String(f.get('name')),p_phone:String(f.get('phone')),p_whatsapp_opt_in:f.get('whatsapp_opt_in')==='on'});if(error)setMessage(error.message);else setDone(true)}
- if(loading)return <main className="public-booking"><div className="booking-loader">Buscando horarios disponibles...</div></main>;
- if(!user)return <main className="public-booking"><header className="booking-brand"><a href="/">ST</a><div><b>SACA UN TURNITO</b><span>Reservas online</span></div></header><section className="login-required"><div className="lock-badge">✓</div><p className="page-kicker">RESERVA PROTEGIDA</p><h1>Ingresá para sacar tu turno</h1><p>Tu cuenta evita reservas falsas y te permite consultar o cancelar tus turnos.</p><a className="primary-link" href="/ingresar?tipo=cliente&next=/reservar">Ingresar y continuar</a><small>Podés ingresar con Google o crear una cuenta.</small></section></main>;
- if(done)return <main className="public-booking"><header className="booking-brand"><a href="/">ST</a><div><b>SACA UN TURNITO</b><span>Reservas online</span></div></header><section className="booking-success"><div>✓</div><p className="page-kicker">SOLICITUD RECIBIDA</p><h1>Tu horario quedó reservado</h1><p>Tenés {catalog?.organization.hold_minutes||60} minutos para que la empresa confirme el turno. Vas a recibir el aviso por correo.</p><a className="primary-link" href="/">Volver al inicio</a></section></main>;
- return <main className="public-booking"><header className="booking-brand"><a href="/">ST</a><div><b>SACA UN TURNITO</b><span>Reservas online</span></div><a className="booking-account" href="/reservar">Mis turnos</a></header><section className="booking-hero"><div><p className="page-kicker">RESERVA ONLINE</p><h1>Elegí el mejor momento para vos.</h1><p>{catalog?.organization.description||'Seleccioná servicio, profesional y horario disponible.'}</p></div>{orgs.length>1&&<label>Empresa<select value={slug} onChange={e=>setSlug(e.target.value)}>{orgs.map(o=><option key={o.id} value={o.slug}>{o.name}</option>)}</select></label>}</section>{message&&<div className="booking-notice" role="alert">{message}</div>}<form className="booking-workspace" onSubmit={book}><section className="booking-main"><div className="booking-step"><span>1</span><div><b>Elegí un servicio</b><small>Duración y valor</small></div></div><div className="service-choices">{catalog?.services.map(s=><button type="button" key={s.id} className={service===s.id?'selected':''} onClick={()=>setService(s.id)}><i style={{background:s.color}}/><div><b>{s.name}</b><small>{s.description||`${s.duration_minutes} minutos`}</small></div><span>{s.duration_minutes} min</span></button>)}</div><div className="booking-step"><span>2</span><div><b>Elegí profesional y sucursal</b><small>Dónde querés atenderte</small></div></div><div className="choice-grid"><label>Sucursal<select value={branch} onChange={e=>setBranch(e.target.value)}>{catalog?.locations.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label><label>Profesional<select value={professional} onChange={e=>setProfessional(e.target.value)}>{catalog?.professionals.map(p=><option key={p.id} value={p.id}>{p.full_name}</option>)}</select></label></div><div className="booking-step"><span>3</span><div><b>Elegí fecha y horario</b><small>Solo mostramos disponibilidad real</small></div></div><label className="date-field">Fecha<input type="date" min={tomorrow()} value={date} onChange={e=>setDate(e.target.value)}/></label><div className="slot-grid">{slots.length?slots.map(s=><button type="button" key={s} className={slot===s?'selected':''} onClick={()=>setSlot(s)}>{new Date(s).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</button>):<p className="no-slots">No hay horarios para esta selección. Probá otra fecha o profesional.</p>}</div></section><aside className="booking-summary"><p className="page-kicker">TU TURNO</p><h2>Resumen</h2><div className="summary-line"><span>Servicio</span><b>{selectedService?.name||'A elegir'}</b></div><div className="summary-line"><span>Duración</span><b>{selectedService?.duration_minutes||'-'} min</b></div><div className="summary-line"><span>Fecha</span><b>{date?new Date(`${date}T12:00:00`).toLocaleDateString('es-AR',{day:'numeric',month:'long'}):'-'}</b></div><div className="summary-line"><span>Horario</span><b>{slot?new Date(slot).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'A elegir'}</b></div><hr/><label>Nombre completo<input name="name" autoComplete="name" minLength={2} maxLength={120} required/></label><label>WhatsApp<input name="phone" type="tel" autoComplete="tel" minLength={8} maxLength={30} placeholder="11 5555 5555" required/></label><label className="check"><input name="whatsapp_opt_in" type="checkbox"/> Quiero recibir por WhatsApp el mensaje de confirmación del turno.</label><button className="primary-button" disabled={!slot}>Reservar este turno</button><small className="hold-note">El horario se guarda por {catalog?.organization.hold_minutes||60} minutos hasta su confirmación.</small></aside></form></main>
+import Link from 'next/link';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import AppLogo from './AppLogo';
+
+type Catalog = {
+  organization: { name: string; slug: string; description?: string; hold_minutes: number };
+  locations: Array<{ id: string; name: string; address?: string; description?: string }>;
+  services: Array<{ id: string; name: string; description?: string; duration_minutes: number; price: number | string; color: string }>;
+  professionals: Array<{ id: string; full_name: string; specialty?: string; color: string }>;
+};
+
+const provinces = ['Buenos Aires','Ciudad Autónoma de Buenos Aires','Catamarca','Chaco','Chubut','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán'];
+
+function today() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60_000).toISOString().slice(0, 10);
+}
+
+function BookingBrand() {
+  return (
+    <header className="booking-brand">
+      <Link className="booking-brand-logo" href="/" aria-label="Volver al inicio"><AppLogo title="SACA UN TURNITO" /></Link>
+      <div><b>SACA UN TURNITO</b><span>Reservas online</span></div>
+      <Link className="booking-account" href="/ingresar">Acceso profesional</Link>
+    </header>
+  );
+}
+
+export default function BookingWizard({ tenantSlug }: { tenantSlug: string }) {
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [dni, setDni] = useState('');
+  const [needsDetails, setNeedsDetails] = useState(false);
+  const [customerToken, setCustomerToken] = useState('');
+  const [service, setService] = useState('');
+  const [professional, setProfessional] = useState('');
+  const [locationId, setLocationId] = useState('');
+  const [date, setDate] = useState(today);
+  const [slots, setSlots] = useState<string[]>([]);
+  const [slot, setSlot] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [done, setDone] = useState(false);
+
+  const selectedService = useMemo(() => catalog?.services.find((item) => item.id === service), [catalog, service]);
+  const selectedProfessional = useMemo(() => catalog?.professionals.find((item) => item.id === professional), [catalog, professional]);
+  const selectedLocation = useMemo(() => catalog?.locations.find((item) => item.id === locationId), [catalog, locationId]);
+
+  useEffect(() => {
+    void (async () => {
+      setLoading(true);
+      const response = await fetch(`/api/public/catalog/${encodeURIComponent(tenantSlug)}`, { cache: 'no-store' });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result) {
+        setMessage(result?.error || 'No pudimos cargar esta agenda.');
+        setLoading(false);
+        return;
+      }
+      const next = result as Catalog;
+      setCatalog(next);
+      setService(next.services[0]?.id || '');
+      setProfessional(next.professionals[0]?.id || '');
+      setLocationId(next.locations[0]?.id || '');
+      setLoading(false);
+    })();
+  }, [tenantSlug]);
+
+  useEffect(() => {
+    if (!(customerToken && service && professional && locationId && date)) {
+      setSlots([]);
+      setSlot('');
+      return;
+    }
+    const controller = new AbortController();
+    void (async () => {
+      setMessage('');
+      const params = new URLSearchParams({ slug: tenantSlug, service, professional, location: locationId, date });
+      const response = await fetch(`/api/public/slots?${params}`, { cache: 'no-store', signal: controller.signal });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        setMessage(result?.error || 'No pudimos consultar los horarios.');
+        return;
+      }
+      setSlots(result.slots || []);
+      setSlot('');
+    })().catch((error) => { if (error?.name !== 'AbortError') setMessage('No pudimos consultar los horarios.'); });
+    return () => controller.abort();
+  }, [customerToken, date, locationId, professional, service, tenantSlug]);
+
+  async function identify(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setMessage('');
+    const normalized = dni.replace(/\D/g, '');
+    const response = await fetch('/api/public/customer', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: tenantSlug, dni: normalized }),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) setMessage(result?.error || 'No pudimos validar el DNI.');
+    else if (result.exists) setCustomerToken(result.customerToken);
+    else setNeedsDetails(true);
+    setBusy(false);
+  }
+
+  async function register(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setMessage('');
+    const form = new FormData(event.currentTarget);
+    const response = await fetch('/api/public/customer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slug: tenantSlug,
+        dni: dni.replace(/\D/g, ''),
+        details: {
+          fullName: String(form.get('fullName')),
+          email: String(form.get('email')),
+          phone: String(form.get('phone')),
+          address: String(form.get('address')),
+          city: String(form.get('city')),
+          province: String(form.get('province')),
+          whatsappOptIn: form.get('whatsappOptIn') === 'on',
+        },
+      }),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) setMessage(result?.error || 'No pudimos guardar tus datos.');
+    else setCustomerToken(result.customerToken);
+    setBusy(false);
+  }
+
+  async function book(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!slot || !customerToken || busy) return;
+    setBusy(true);
+    setMessage('');
+    const response = await fetch('/api/public/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: tenantSlug, customerToken, serviceId: service, professionalId: professional, locationId, startsAt: slot }),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) {
+      setMessage(result?.error || 'No pudimos reservar el turno.');
+      if (response.status === 401) resetIdentity();
+      setBusy(false);
+      return;
+    }
+    setDone(true);
+  }
+
+  function resetIdentity() {
+    setCustomerToken('');
+    setNeedsDetails(false);
+    setDni('');
+    setSlot('');
+  }
+
+  if (loading) return <main className="public-booking"><div className="booking-loader">Preparando la agenda...</div></main>;
+  if (!catalog) return <main className="public-booking"><BookingBrand /><section className="booking-success booking-error"><div>!</div><h1>Agenda no disponible</h1><p>{message}</p><Link className="primary-link" href="/">Volver al inicio</Link></section></main>;
+
+  if (done) {
+    return (
+      <main className="public-booking">
+        <BookingBrand />
+        <section className="booking-success">
+          <div>✓</div><p className="page-kicker">SOLICITUD RECIBIDA</p><h1>Tu horario quedó reservado</h1>
+          <p>{catalog.organization.name} tiene {catalog.organization.hold_minutes} minutos para confirmar el turno. Te avisaremos al correo registrado.</p>
+          <Link className="primary-link" href="/">Volver al inicio</Link>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="public-booking">
+      <BookingBrand />
+      <section className="booking-hero booking-hero-warm">
+        <div><p className="page-kicker">AGENDA DE {catalog.organization.name.toUpperCase()}</p><h1>Tu turno, fácil y rápido.</h1><p>{catalog.organization.description || 'Validá tu DNI una sola vez y elegí entre los horarios realmente disponibles.'}</p></div>
+        <div className="booking-progress" aria-label="Progreso de la reserva"><span className="active">1 <b>Datos</b></span><i /><span className={customerToken ? 'active' : ''}>2 <b>Turno</b></span><i /><span>3 <b>Listo</b></span></div>
+      </section>
+
+      {message ? <div className="booking-notice" role="alert">{message}</div> : null}
+
+      {!customerToken ? (
+        <section className="identity-shell">
+          <article className="identity-copy">
+            <span className="identity-icon" aria-hidden="true">DNI</span>
+            <p className="page-kicker">IDENTIFICACIÓN SIMPLE</p>
+            <h2>{needsDetails ? 'Completá tus datos por única vez' : 'Ingresá tu DNI para comenzar'}</h2>
+            <p>{needsDetails ? 'La próxima vez, con el mismo DNI recuperaremos estos datos de forma privada.' : 'No necesitás crear una cuenta, recordar una contraseña ni entrar con Google.'}</p>
+            <ul><li>Tu información no se muestra públicamente.</li><li>Solo se usa para gestionar tus turnos.</li><li>La empresa verá únicamente sus propios clientes.</li></ul>
+          </article>
+          {!needsDetails ? (
+            <form className="identity-form" onSubmit={identify}>
+              <label>Número de DNI<input value={dni} onChange={(event) => setDni(event.target.value.replace(/\D/g, '').slice(0, 9))} inputMode="numeric" autoComplete="off" minLength={6} maxLength={9} placeholder="Ejemplo: 30123456" autoFocus required /></label>
+              <small>Escribilo sin puntos ni espacios.</small>
+              <button className="primary-button" disabled={busy || dni.length < 6}>{busy ? 'Validando...' : 'Continuar con mi DNI'} <span>→</span></button>
+            </form>
+          ) : (
+            <form className="identity-form identity-form-details" onSubmit={register}>
+              <div className="dni-confirmed"><span>DNI</span><b>{dni}</b><button type="button" onClick={resetIdentity}>Cambiar</button></div>
+              <label>Nombre y apellido<input name="fullName" autoComplete="name" minLength={2} maxLength={120} required /></label>
+              <div className="identity-grid"><label>Correo electrónico<input name="email" type="email" autoComplete="email" maxLength={254} required /></label><label>Celular<input name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Código de área + número" required /><small>Sin 0 y sin 15.</small></label></div>
+              <label>Dirección<input name="address" autoComplete="street-address" maxLength={180} required /></label>
+              <div className="identity-grid"><label>Localidad<input name="city" autoComplete="address-level2" maxLength={100} required /></label><label>Provincia<select name="province" autoComplete="address-level1" defaultValue="" required><option value="" disabled>Seleccioná</option>{provinces.map((province) => <option key={province}>{province}</option>)}</select></label></div>
+              <label className="check"><input name="whatsappOptIn" type="checkbox" /> Acepto recibir por WhatsApp el único mensaje de confirmación del turno.</label>
+              <button className="primary-button" disabled={busy}>{busy ? 'Guardando...' : 'Guardar y elegir turno'} <span>→</span></button>
+            </form>
+          )}
+        </section>
+      ) : (
+        <form className="booking-workspace" onSubmit={book}>
+          <section className="booking-main">
+            <div className="identity-ready"><span>✓</span><div><b>Datos identificados de forma segura</b><small>Usaremos la información registrada para este turno.</small></div><button type="button" onClick={resetIdentity}>Cambiar DNI</button></div>
+            <div className="booking-step"><span>1</span><div><b>Elegí un servicio</b><small>Duración y valor</small></div></div>
+            <div className="service-choices">
+              {catalog.services.map((item) => <button type="button" key={item.id} className={service === item.id ? 'selected' : ''} aria-pressed={service === item.id} onClick={() => setService(item.id)}><i style={{ background: item.color }} /><div><b>{item.name}</b><small>{item.description || `${item.duration_minutes} minutos`}</small></div><span>{item.duration_minutes} min</span></button>)}
+            </div>
+            <div className="booking-step"><span>2</span><div><b>Elegí profesional y sucursal</b><small>Dónde querés atenderte</small></div></div>
+            <div className="choice-grid"><label>Sucursal<select value={locationId} onChange={(event) => setLocationId(event.target.value)}>{catalog.locations.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label>Profesional<select value={professional} onChange={(event) => setProfessional(event.target.value)}>{catalog.professionals.map((item) => <option key={item.id} value={item.id}>{item.full_name}</option>)}</select></label></div>
+            <div className="booking-step"><span>3</span><div><b>Elegí fecha y horario</b><small>Solo mostramos disponibilidad real</small></div></div>
+            <label className="date-field">Fecha<input type="date" min={today()} value={date} onChange={(event) => setDate(event.target.value)} /></label>
+            <div className="slot-grid">{slots.length ? slots.map((item) => <button type="button" key={item} className={slot === item ? 'selected' : ''} aria-pressed={slot === item} onClick={() => setSlot(item)}>{new Date(item).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</button>) : <p className="no-slots">No hay horarios para esta selección. Probá otra fecha o profesional.</p>}</div>
+          </section>
+          <aside className="booking-summary">
+            <p className="page-kicker">TU TURNO</p><h2>Resumen</h2>
+            <div className="summary-line"><span>Servicio</span><b>{selectedService?.name || 'A elegir'}</b></div>
+            <div className="summary-line"><span>Profesional</span><b>{selectedProfessional?.full_name || 'A elegir'}</b></div>
+            <div className="summary-line"><span>Sucursal</span><b>{selectedLocation?.name || 'A elegir'}</b></div>
+            <div className="summary-line"><span>Fecha</span><b>{date ? new Date(`${date}T12:00:00`).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' }) : '-'}</b></div>
+            <div className="summary-line"><span>Horario</span><b>{slot ? new Date(slot).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : 'A elegir'}</b></div>
+            <hr /><button className="primary-button" disabled={!slot || busy}>{busy ? 'Reservando...' : 'Reservar este turno'}</button>
+            <small className="hold-note">El horario se guarda por {catalog.organization.hold_minutes} minutos hasta su confirmación.</small>
+          </aside>
+        </form>
+      )}
+    </main>
+  );
 }
