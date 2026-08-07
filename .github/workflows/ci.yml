@@ -1,0 +1,37 @@
+Exit code: 0
+Wall time: 0.6 seconds
+Output:
+name: Verificar aplicacion
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiJ9.example.signature
+      SUPABASE_SERVICE_ROLE_KEY: ci-only-service-role-key-000000000000000000000000000000
+      BOOKING_TOKEN_SECRET: ci-only-booking-token-secret-000000000000000000000000000
+      NEXT_PUBLIC_APP_URL: https://sacaunturnito.vercel.app
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+      - name: Compilar aplicacion
+        run: npm run build
+
