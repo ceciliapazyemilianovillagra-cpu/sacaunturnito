@@ -3,6 +3,7 @@
 import { supabase } from '../../lib/supabase-browser';
 import AppLogo from './AppLogo';
 import InstallAppButton from './InstallAppButton';
+import BillingPanel from './BillingPanel';
 
 export default function SettingsTools() {
   async function logout() {
@@ -11,6 +12,8 @@ export default function SettingsTools() {
   }
 
   return (
+    <>
+    <BillingPanel />
     <section className="settings-tools" aria-label="Configuración de la aplicación">
       <article className="settings-tool-card install-card">
         <AppLogo className="settings-logo" title="SACA UN TURNITO" />
@@ -34,5 +37,6 @@ export default function SettingsTools() {
         </div>
       </article>
     </section>
+    </>
   );
 }
