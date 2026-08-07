@@ -1,2 +1,5 @@
-import BookingWizard from '../components/BookingWizard';
-export default function Reservar(){return <BookingWizard/>}
+import { redirect } from 'next/navigation';
+
+export default function Reservar() {
+  redirect('/turnos/saca-un-turnito');
+}
